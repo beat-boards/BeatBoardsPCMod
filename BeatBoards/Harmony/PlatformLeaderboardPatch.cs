@@ -1,11 +1,11 @@
 ﻿using BeatBoards.Utilities;
 using BeatBoards.Core;
 using Harmony;
-using System;
 using System.Collections.Generic;
+using HMUI;
+using IPA.Utilities;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using BeatBoards.UI;
 
 namespace BeatBoards.Harmony
 {
@@ -13,19 +13,23 @@ namespace BeatBoards.Harmony
     [HarmonyPatch("Refresh")]
     class PlatformLeaderboardPatch
     {
-        static bool Prefix(ref IDifficultyBeatmap ____difficultyBeatmap, ref List<LeaderboardTableView.ScoreData> ____scores, ref bool ____hasScoresData, ref LeaderboardTableView ____leaderboardTableView, ref int[] ____playerScorePos, ref PlatformLeaderboardsModel.ScoresScope ____scoresScope)
+
+        static bool Prefix(ref IDifficultyBeatmap ____difficultyBeatmap, ref List<LeaderboardTableView.ScoreData> ____scores, ref bool ____hasScoresData, ref LeaderboardTableView ____leaderboardTableView, ref int[] ____playerScorePos, ref PlatformLeaderboardsModel.ScoresScope ____scoresScope, ref IconSegmentedControl ____scopeSegmentedControl)
         {
             if (____difficultyBeatmap.level is CustomBeatmapLevel)
             {
+                IconSegmentedControl.DataItem thirdCell = ____scopeSegmentedControl.GetPrivateField<IconSegmentedControl.DataItem[]>("_dataItems").Last();
+                thirdCell.SetPrivateProperty("hintText", "Platform: PC");
+                thirdCell.SetPrivateProperty("icon", LeaderboardUIManager.Instance.PCIcon);
+                //____scopeSegmentedControl.ReloadData();
+
                 ____hasScoresData = false;
                 ____scores.Clear();
                 ____leaderboardTableView.SetScores(____scores, ____playerScorePos[(int)____scoresScope]);
-                Logger.Log.Warn("CustomBeatmap");
                 Events.Instance.leaderboardOpened.Invoke(____difficultyBeatmap, ____leaderboardTableView);
                 return false;
 
             }
-            Logger.Log.Warn("Base game song");
             return true;
         }
     }

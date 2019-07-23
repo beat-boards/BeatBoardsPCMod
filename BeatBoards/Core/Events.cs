@@ -1,15 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using BeatBoards.Utilities;
 using Logger = BeatBoards.Utilities.Logger;
-using CustomUI.Utilities;
-using TMPro;
-using SongCore.Data;
 using UnityEngine.Events;
 
 namespace BeatBoards.Core
@@ -34,8 +26,7 @@ namespace BeatBoards.Core
             }
         }
 
-        public UnityEvent<IPreviewBeatmapLevel, PlatformLeaderboardViewController> songSelected;  //  Action<IPreviewBeatmapLevel, PlatformLeaderboardViewController> songSelected;
-        private PlatformLeaderboardViewController platformLeaderboardViewController;
+        public UnityEvent<IPreviewBeatmapLevel, PlatformLeaderboardViewController> songSelected;
 
         public void Init()
         {
@@ -52,8 +43,8 @@ namespace BeatBoards.Core
             }
             if (newScene.name == "MenuCore")
             {
-                platformLeaderboardViewController = Resources.FindObjectsOfTypeAll<PlatformLeaderboardViewController>().FirstOrDefault();
+                
             }
         }
     }
-} //TextMeshProUGUI _infoText = platformLeaderboardViewController.GetPrivateField<TextMeshProUGUI>("_infoText");
+}

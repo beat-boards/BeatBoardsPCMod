@@ -44,9 +44,6 @@
     <Reference Include="IPA.Loader">
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Beat Saber\Beat Saber_Data\Managed\IPA.Loader.dll</HintPath>
     </Reference>
-    <Reference Include="SongCore">
-      <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Beat Saber\Plugins\SongCore.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -68,16 +65,20 @@
   <ItemGroup>
     <Compile Include="Core\Events.cs" />
     <Compile Include="Core\Plugin.cs" />
+    <Compile Include="Harmony\PlatformLeaderboardActivation.cs" />
     <Compile Include="Harmony\PlatformLeaderboardPatch.cs" />
     <Compile Include="Harmony\StandardLevelDetailViewContentPresented.cs" />
     <Compile Include="UI\LeaderboardUIManager.cs" />
+    <Compile Include="Utilities\Conversions.cs" />
     <Compile Include="Utilities\Logger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="manifest.json" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="Media\icon_pc1.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>copy /Y "$(TargetDir)$(TargetName).dll" "C:\Program Files (x86)\Steam\steamapps\common\Beat Saber\Plugins\$(TargetName).dll"</PostBuildEvent>
