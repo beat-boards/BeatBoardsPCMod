@@ -17,8 +17,8 @@ namespace BeatBoards.UI
             {
                 if (_instance == null)
                 {
-                    Logger.Log.Debug("Initializing: BeatBoards Leaderboard UI Manager");
-                    GameObject eventsGameObject = new GameObject("BeatBoards: Events Singleton");
+                    Logger.Log.Info("Initializing: BeatBoards Leaderboard UI Manager");
+                    GameObject eventsGameObject = new GameObject("BeatBoards: Leaderboard UI Manager Singleton");
                     _instance = eventsGameObject.AddComponent<LeaderboardUIManager>();
                     DontDestroyOnLoad(eventsGameObject);
                     _instance.Init();
@@ -30,16 +30,20 @@ namespace BeatBoards.UI
         Events eventManager;
         private Sprite _PCIcon;
         public Sprite PCIcon { get { if (_PCIcon == null) { _PCIcon = UIUtilities.LoadSpriteFromResources("BeatBoards.Media.icon_pc1.png"); } return _PCIcon; } }
-        List<string> varioususernames = new List<string>() { "Taichi", "LogantheobaldRank5InTheWorld", "Auros", "Assistant", "Megalon", "elliottate", "Klouder", "OrangeW", "Umbranox", "joelseph", "Beige", "Range", "Sam", "DeeJay", "andruzzzhka", "Arti", "DaNike", "emulamer", "halsafar", "ikeiwa", "monkeymanboy", "Moon", "Nova", "raftario", "Ruu | LIV", "ragesaq darth maul", "Reaxt", "Thanos" };
+        List<string> varioususernames = new List<string>() { "Taichi", "Logantheobald, Rank 5 in the world on Beat Saber", "Auros", "Assistant", "Megalon", "elliottate", "Klouder", "OrangeW", "Umbranox", "joelseph", "Beige", "Range", "Sam", "DeeJay", "andruzzzhka", "Arti", "DaNike", "emulamer", "halsafar", "ikeiwa", "monkeymanboy", "Moon", "Nova", "raftario", "Ruu | LIV", "ragesaq darth maul", "Reaxt", "Thanos" };
 
         public void Init()
         {
             eventManager = Events.Instance;
             eventManager.leaderboardOpened += LeaderboardOpened_Event;
             _ = PCIcon;
-            Logger.Log.Warn(PCIcon.ToString());
         }
         
+        public void OnDisable()
+        {
+            eventManager.leaderboardOpened -= LeaderboardOpened_Event;
+        }
+
         private List<LeaderboardTableView.ScoreData> RandomLeaderboardData()
         {
             var randomizedorder = varioususernames.OrderBy(a => Guid.NewGuid()).ToList();
@@ -55,7 +59,7 @@ namespace BeatBoards.UI
                 if (UnityEngine.Random.Range(1f, 13f) == 4)
                     fc = true;
 
-                scoreData.Add(new LeaderboardTableView.ScoreData(randomScore, $"{username} <size=70%>(<color=#8800ff>{percent}%</color> - <color=#00ffff>{percent * 1.3}RP</color>)</size><size=40%> Global: {randomRank}</size>", rank, fc));
+                scoreData.Add(new LeaderboardTableView.ScoreData(randomScore, $"{username} <size=70%>(<color=#bf42f5>{percent}%</color> - <color=#00ffff>{percent * 1.3}RP</color>)</size><size=40%> Global: {randomRank}</size>", rank, fc));
                 rank++;
             }
             return scoreData;
@@ -63,6 +67,8 @@ namespace BeatBoards.UI
 
         private void LeaderboardOpened_Event(IDifficultyBeatmap arg1, LeaderboardTableView arg2)
         {
+            Logger.Log.Warn(Environment.CurrentDirectory.Replace('\\', '/'));
+
             List<LeaderboardTableView.ScoreData> scoreData = new List<LeaderboardTableView.ScoreData>() { };
             var scda = RandomLeaderboardData().OrderByDescending(a => a.score).ToList();
             int rank = 1;

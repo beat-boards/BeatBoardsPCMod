@@ -23,8 +23,6 @@ namespace BeatBoards.Harmony
                 new IconSegmentedControl.DataItem(____aroundPlayerLeaderboardIcon, "Around You"),
                 new IconSegmentedControl.DataItem(LeaderboardUIManager.Instance.PCIcon, "Platform: PC")
             });
-
-
         }
     }
 }

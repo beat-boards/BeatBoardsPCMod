@@ -3,6 +3,9 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using Logger = BeatBoards.Utilities.Logger;
 using UnityEngine.Events;
+using System.Linq;
+using Newtonsoft.Json;
+using System.IO;
 
 namespace BeatBoards.Core
 {
@@ -16,7 +19,7 @@ namespace BeatBoards.Core
             {
                 if (_instance == null)
                 {
-                    Logger.Log.Debug("Initializing: BeatBoards Events");
+                    Logger.Log.Info("Initializing: BeatBoards Events");
                     GameObject eventsGameObject = new GameObject("BeatBoards: Events Singleton");
                     _instance = eventsGameObject.AddComponent<Events>();
                     DontDestroyOnLoad(eventsGameObject);
@@ -26,24 +29,32 @@ namespace BeatBoards.Core
             }
         }
 
-        public UnityEvent<IPreviewBeatmapLevel, PlatformLeaderboardViewController> songSelected;
-
         public void Init()
         {
             SceneManager.activeSceneChanged += ActiveSceneChanged;
         }
 
+        public void OnDisable()
+        {
+            SceneManager.activeSceneChanged -= ActiveSceneChanged;
+        }
+
+        public Action levelStarted;
         public Action<IDifficultyBeatmap, LeaderboardTableView> leaderboardOpened;
 
         private void ActiveSceneChanged(Scene oldScene, Scene newScene)
         {
             if (newScene.name == "GameCore")
             {
-
+                //_ = Replays.ReplayManager.Instance;
+                //levelStarted.Invoke();
             }
             if (newScene.name == "MenuCore")
             {
-                
+                if (oldScene.name == "GameCore")
+                {
+                    //Destroy(Replays.ReplayManager.Instance);
+                }
             }
         }
     }
