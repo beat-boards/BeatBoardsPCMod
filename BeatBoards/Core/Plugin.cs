@@ -1,8 +1,8 @@
-﻿using BeatBoards.Utilities;
+﻿using BeatBoards.UI;
+using BeatBoards.Utilities;
+using CustomUI.MenuButton;
 using Harmony;
 using IPA;
-using IPA.Config;
-using IPA.Utilities;
 using UnityEngine.SceneManagement;
 using IPALogger = IPA.Logging.Logger;
 
@@ -49,7 +49,10 @@ namespace BeatBoards
 
         public void OnSceneLoaded(Scene scene, LoadSceneMode sceneMode)
         {
-
+            if (scene.name == "MenuCore")
+            {
+                MenuButtonUI.AddButton("Beat Boards", BeatBoardsMenu.Load);
+            }
         }
 
         public void OnSceneUnloaded(Scene scene)

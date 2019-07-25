@@ -7,6 +7,7 @@ using BeatBoards.Core;
 using CustomUI.Utilities;
 using UnityEngine.UI;
 using CustomUI.BeatSaber;
+using CustomUI.MenuButton;
 
 namespace BeatBoards.UI
 {
@@ -35,28 +36,20 @@ namespace BeatBoards.UI
         List<string> varioususernames = new List<string>() { "Taichi", "Logantheobald, Rank 5 in the world on Beat Saber", "Auros", "Assistant", "Megalon", "elliottate", "Klouder", "OrangeW", "Umbranox", "joelseph", "Beige", "Range", "Sam", "DeeJay", "andruzzzhka", "Arti", "DaNike", "emulamer", "halsafar", "ikeiwa", "monkeymanboy", "Moon", "Nova", "raftario", "Ruu | LIV", "ragesaq darth maul", "Reaxt", "Thanos" };
         public Button replaysButton;
         public string currentlySelectedReplay = "411622272";
+        IDifficultyBeatmap currentlySelectedBeatmap;
 
         public void Init()
         {
+            
+
             eventManager = Events.Instance;
             eventManager.leaderboardOpened += LeaderboardOpened_Event;
-            eventManager.levelStarted += LevelStarted_Event;
             _ = PCIcon;
-
-            //var replayMenuButton = platformLeaderboardViewController.CreateUIButton("SettingsButton", new Vector2(-40f, -40f));
-            //replayMenuButton.SetButtonText("Replays");
-            
-        }
-
-        private void LevelStarted_Event()
-        {
-            
         }
 
         public void OnDisable()
         {
             eventManager.leaderboardOpened -= LeaderboardOpened_Event;
-            eventManager.levelStarted -= LevelStarted_Event;
         }
 
         private List<LeaderboardTableView.ScoreData> RandomLeaderboardData()
@@ -79,8 +72,6 @@ namespace BeatBoards.UI
             }
             return scoreData;
         }
-
-        IDifficultyBeatmap currentlySelectedBeatmap;
 
         private void LeaderboardOpened_Event(IDifficultyBeatmap arg1, LeaderboardTableView arg2)
         {
