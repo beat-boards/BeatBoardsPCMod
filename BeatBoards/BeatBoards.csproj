@@ -41,6 +41,9 @@
     <Reference Include="BeatSaberCustomUI">
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Beat Saber\Plugins\BeatSaberCustomUI.dll</HintPath>
     </Reference>
+    <Reference Include="BS_Utils">
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Beat Saber\Plugins\BS_Utils.dll</HintPath>
+    </Reference>
     <Reference Include="IPA.Loader">
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Beat Saber\Beat Saber_Data\Managed\IPA.Loader.dll</HintPath>
     </Reference>
@@ -71,7 +74,7 @@
     <Compile Include="Harmony\PlayerControllerUpdatePatch.cs" />
     <Compile Include="Harmony\PlatformLeaderboardActivation.cs" />
     <Compile Include="Harmony\PlatformLeaderboardPatch.cs" />
-    <Compile Include="Harmony\SaberManagerUpdatePatch.cs" />
+    <Compile Include="Harmony\VRControllerUpdatePatch.cs" />
     <Compile Include="Replays\ReplayManager.cs" />
     <Compile Include="UI\LeaderboardUIManager.cs" />
     <Compile Include="Utilities\Conversions.cs" />
@@ -84,7 +87,6 @@
   <ItemGroup>
     <EmbeddedResource Include="Media\icon_pc1.png" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>copy /Y "$(TargetDir)$(TargetName).dll" "C:\Program Files (x86)\Steam\steamapps\common\Beat Saber\Plugins\$(TargetName).dll"</PostBuildEvent>

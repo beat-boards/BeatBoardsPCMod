@@ -5,6 +5,8 @@ using UnityEngine;
 using Logger = BeatBoards.Utilities.Logger;
 using BeatBoards.Core;
 using CustomUI.Utilities;
+using UnityEngine.UI;
+using CustomUI.BeatSaber;
 
 namespace BeatBoards.UI
 {
@@ -31,17 +33,30 @@ namespace BeatBoards.UI
         private Sprite _PCIcon;
         public Sprite PCIcon { get { if (_PCIcon == null) { _PCIcon = UIUtilities.LoadSpriteFromResources("BeatBoards.Media.icon_pc1.png"); } return _PCIcon; } }
         List<string> varioususernames = new List<string>() { "Taichi", "Logantheobald, Rank 5 in the world on Beat Saber", "Auros", "Assistant", "Megalon", "elliottate", "Klouder", "OrangeW", "Umbranox", "joelseph", "Beige", "Range", "Sam", "DeeJay", "andruzzzhka", "Arti", "DaNike", "emulamer", "halsafar", "ikeiwa", "monkeymanboy", "Moon", "Nova", "raftario", "Ruu | LIV", "ragesaq darth maul", "Reaxt", "Thanos" };
+        public Button replaysButton;
+        public string currentlySelectedReplay = "411622272";
 
         public void Init()
         {
             eventManager = Events.Instance;
             eventManager.leaderboardOpened += LeaderboardOpened_Event;
+            eventManager.levelStarted += LevelStarted_Event;
             _ = PCIcon;
+
+            //var replayMenuButton = platformLeaderboardViewController.CreateUIButton("SettingsButton", new Vector2(-40f, -40f));
+            //replayMenuButton.SetButtonText("Replays");
+            
         }
-        
+
+        private void LevelStarted_Event()
+        {
+            
+        }
+
         public void OnDisable()
         {
             eventManager.leaderboardOpened -= LeaderboardOpened_Event;
+            eventManager.levelStarted -= LevelStarted_Event;
         }
 
         private List<LeaderboardTableView.ScoreData> RandomLeaderboardData()
@@ -65,10 +80,11 @@ namespace BeatBoards.UI
             return scoreData;
         }
 
+        IDifficultyBeatmap currentlySelectedBeatmap;
+
         private void LeaderboardOpened_Event(IDifficultyBeatmap arg1, LeaderboardTableView arg2)
         {
-            Logger.Log.Warn(Environment.CurrentDirectory.Replace('\\', '/'));
-
+            currentlySelectedBeatmap = arg1;
             List<LeaderboardTableView.ScoreData> scoreData = new List<LeaderboardTableView.ScoreData>() { };
             var scda = RandomLeaderboardData().OrderByDescending(a => a.score).ToList();
             int rank = 1;
@@ -78,6 +94,36 @@ namespace BeatBoards.UI
                 rank++;
             }
             arg2.SetScores(scoreData, 100);
+
+
+            Replays.ReplayManager.Instance.currentLevelHash = currentlySelectedBeatmap.level.levelID;
+            Replays.ReplayManager.Instance.currentDifficulty = currentlySelectedBeatmap.difficulty.ToString();
+            Replays.ReplayManager.Instance.selectedReplay = currentlySelectedReplay;
+        }
+
+        public void ReplayMenu()
+        {
+            var replaySelectionMenu = BeatSaberUI.CreateCustomMenu<CustomMenu>("Replays");
+            var viewController = BeatSaberUI.CreateViewController<CustomListViewController>();
+            replaySelectionMenu.SetRightViewController(viewController, true, (firstActivation, type) =>
+            {
+                viewController.Data.Add(new CustomCellInfo("eggs", "i never used list cells before", PCIcon));
+                viewController._customListTableView.ReloadData();
+
+                var button = viewController.CreateUIButton("OkButton", new Vector2(20f, 20f));
+                button.onClick.AddListener(delegate { Replays.ReplayManager.Instance.recording = true; Replays.ReplayManager.Instance.playback = false; });
+                button.SetButtonText("record");
+
+                var button2 = viewController.CreateUIButton("OkButton", new Vector2(20f, 0f));
+                button2.onClick.AddListener(delegate { Replays.ReplayManager.Instance.recording = false; Replays.ReplayManager.Instance.playback = true; });
+                button2.SetButtonText("playback");
+
+                var button3 = viewController.CreateUIButton("OkButton", new Vector2(20f, -20f));
+                button3.onClick.AddListener(delegate { Replays.ReplayManager.Instance.recording = false; Replays.ReplayManager.Instance.playback = false; });
+                button3.SetButtonText("neither");
+
+            });
+            replaySelectionMenu.Present();
         }
     }
 }

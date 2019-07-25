@@ -7,6 +7,8 @@ using Logger = BeatBoards.Utilities.Logger;
 using System.Collections;
 using Newtonsoft.Json;
 using System.IO;
+using BeatBoards.UI;
+using CustomUI.Utilities;
 
 namespace BeatBoards.Replays
 {
@@ -54,14 +56,23 @@ namespace BeatBoards.Replays
         }
         public Events eventsManager;
         public List<PositionData> positionData = new List<PositionData>() { };
+        public List<PositionData> playBackData;
+        public Dictionary<float, PositionData> posDictionary = new Dictionary<float, PositionData>() { };
+        public bool gameObjectActive = false;
+        public bool recording = false;
+        public bool playback = false;
+        public string currentLevelHash;
+        public string currentDifficulty;
+        public string selectedReplay;
+        
+
         private void Init()
         {
             eventsManager = Events.Instance;
             eventsManager.levelStarted += LevelStarted;
         }
 
-        public List<PositionData> playBackData;
-        public Dictionary<float, PositionData> posDictionary = new Dictionary<float, PositionData>() { };
+        
 
         private void OnDisable()
         {
@@ -71,11 +82,11 @@ namespace BeatBoards.Replays
             if (recording == true)
             {
                 var uniqueList = positionData.GroupBy(x => x.SongTime).Select(y => y.First()).ToList();
-                File.WriteAllText(Environment.CurrentDirectory.Replace('\\', '/') + "/ReplayData_" + uniqueList.GetHashCode() + ".json", JsonConvert.SerializeObject(uniqueList));
+                var finalData = new PositionDataSet() { Date = DateTime.Now.ToString(), Difficulty = currentDifficulty, PositionData = uniqueList };
+                if (!Directory.Exists(Environment.CurrentDirectory.Replace('\\', '/') + "/UserData/Replays/" + currentLevelHash))
+                    Directory.CreateDirectory(Environment.CurrentDirectory.Replace('\\', '/') + "/UserData/Replays/" + currentLevelHash);
+                File.WriteAllText(Environment.CurrentDirectory.Replace('\\', '/') + "/UserData/Replays/" + currentLevelHash + "/ReplayData_" + finalData.GetHashCode() + ".json", JsonConvert.SerializeObject(finalData));
             }
-
-            
-
         }
         private void LevelStarted()
         {
@@ -86,62 +97,63 @@ namespace BeatBoards.Replays
 
             if (playback == true)
             {
-                playBackData = JsonConvert.DeserializeObject<List<PositionData>>(File.ReadAllText(Environment.CurrentDirectory.Replace('\\', '/') + "/ReplayData_1953971712.json"));
+                var playBackInfo = JsonConvert.DeserializeObject<PositionDataSet>(File.ReadAllText(Environment.CurrentDirectory.Replace('\\', '/') + "/UserData/Replays/" + currentLevelHash + "/ReplayData_" + selectedReplay + ".json"));
+                playBackData = playBackInfo.PositionData;
 
                 foreach (PositionData posDat in playBackData)
                 {
                     posDictionary.Add(posDat.SongTime, posDat);
                     Logger.Log.Info(posDat.SongTime.ToString());
                 }
+
+                SharedCoroutineStarter.instance.StartCoroutine(Playback());
             }
 
             gameObjectActive = true;
         }
         
-        public bool gameObjectActive = false;
-        bool recording = false;
-        public bool playback = false;
+        
         //float counter = 0f;
 
         public IEnumerator UpdateSongTime()
         {
-            Vector3 leftSaberPos = playerController.leftSaber.transform.position;
-            Vector3 leftSaberRot = playerController.leftSaber.transform.rotation.eulerAngles;
-            Vector3 rightSaberPos = playerController.rightSaber.transform.position;
-            Vector3 rightSaberRot = playerController.rightSaber.transform.rotation.eulerAngles;
-
             float t = 0;
             float songLength = audioTimeSyncController.songEndTime;
 
             while (t < songLength)
             {
-                positionData.Add(new PositionData()
-                {
-                    SongTime = (float)Math.Round(audioTimeSyncController.songTime, 2),
-                    LeftSaber = new SaberData()
-                    {
-                        PositionX = leftSaberPos.x,
-                        PositionY = leftSaberPos.y,
-                        PositionZ = leftSaberPos.z,
-                        RotationX = leftSaberRot.x,
-                        RotationY = leftSaberRot.y,
-                        RotationZ = leftSaberRot.z
-                    },
-                    RightSaber = new SaberData()
-                    {
-                        PositionX = rightSaberPos.x,
-                        PositionY = rightSaberPos.y,
-                        PositionZ = rightSaberPos.z,
-                        RotationX = rightSaberRot.x,
-                        RotationY = rightSaberRot.y,
-                        RotationZ = rightSaberRot.z
-                    }
-                    
-                });
+                //Vector3 leftSaberPos = playerController.leftSaber.transform.position;
+                //Vector3 leftSaberRot = playerController.leftSaber.transform.rotation.eulerAngles;
+                //Vector3 rightSaberPos = playerController.rightSaber.transform.position;
+                //Vector3 rightSaberRot = playerController.rightSaber.transform.rotation.eulerAngles;
 
-                
+                //positionData.Add(new PositionData()
+                //{
+                //    SongTime = (float)Math.Round(audioTimeSyncController.songTime, 2),
+                //    LeftSaber = new SaberData()
+                //    {
+                //        PositionX = leftSaberPos.x,
+                //        PositionY = leftSaberPos.y,
+                //        PositionZ = leftSaberPos.z,
+                //        RotationX = leftSaberRot.x,
+                //        RotationY = leftSaberRot.y,
+                //        RotationZ = leftSaberRot.z
+                //    },
+                //    RightSaber = new SaberData()
+                //    {
+                //        PositionX = rightSaberPos.x,
+                //        PositionY = rightSaberPos.y,
+                //        PositionZ = rightSaberPos.z,
+                //        RotationX = rightSaberRot.x,
+                //        RotationY = rightSaberRot.y,
+                //        RotationZ = rightSaberRot.z
+                //    }
+                    
+                //});
+
+
                 //t = audioTimeSyncController.songTime;
-                yield return new WaitForSeconds(.01f);
+                yield return new WaitForEndOfFrame();
             }
         }
 
@@ -152,39 +164,21 @@ namespace BeatBoards.Replays
 
             while (t < songLength)
             {
-                //(float)Math.Round(audioTimeSyncController.songTime, 2)
-
-
-                yield return new WaitForSeconds(.01f);
-            }
-        }
-
-        private void LateUpdate()
-        {
-            if (recording == true)
-            {
                 
-                
-            }
-            else if (playback == true && recording == true)
-            {
-                if (ReplayManager.Instance.playback == true && ReplayManager.Instance.gameObjectActive == true)
-                {
-                    float songTime = ReplayManager.Instance.audioTimeSyncController.songTime;
 
-                    PositionData posDat = null;
-                    bool axe = ReplayManager.Instance.posDictionary.TryGetValue(songTime, out posDat);
 
-                    if (axe == true)
-                    {
-                        Logger.Log.Warn("Okay, this is epic.");
-                    }
-                }
+                yield return new WaitForEndOfFrame();
             }
-            
         }
     }
-    
+
+    public class PositionDataSet
+    {
+        public string Date { get; set; }
+        public string Difficulty { get; set; }
+        public List<PositionData> PositionData { get; set; }
+    }
+
     public class PositionData
     {
         public float SongTime { get; set; }

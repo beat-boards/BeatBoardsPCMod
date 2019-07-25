@@ -46,14 +46,14 @@ namespace BeatBoards.Core
         {
             if (newScene.name == "GameCore")
             {
-                //_ = Replays.ReplayManager.Instance;
-                //levelStarted.Invoke();
+                _ = Replays.ReplayManager.Instance;
+                levelStarted.Invoke();
             }
             if (newScene.name == "MenuCore")
             {
                 if (oldScene.name == "GameCore")
                 {
-                    //Destroy(Replays.ReplayManager.Instance);
+                    Destroy(Replays.ReplayManager.Instance);
                 }
             }
         }

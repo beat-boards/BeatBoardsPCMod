@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BeatBoards.UI;
+using CustomUI.BeatSaber;
 using Harmony;
 using HMUI;
 using UnityEngine;
@@ -23,6 +24,14 @@ namespace BeatBoards.Harmony
                 new IconSegmentedControl.DataItem(____aroundPlayerLeaderboardIcon, "Around You"),
                 new IconSegmentedControl.DataItem(LeaderboardUIManager.Instance.PCIcon, "Platform: PC")
             });
+
+            var replayButton = __instance.CreateUIButton("OkButton", new Vector2(0f, -37f), new Vector2(9.0f, 5.0f));
+            replayButton.ToggleWordWrapping(false);
+            replayButton.SetButtonText("Replays");
+            replayButton.SetButtonTextSize(3);
+            replayButton.onClick.AddListener(LeaderboardUIManager.Instance.ReplayMenu);
+
+            LeaderboardUIManager.Instance.replaysButton = replayButton;
         }
     }
 }

@@ -12,10 +12,10 @@ using Logger = BeatBoards.Utilities.Logger;
 
 namespace BeatBoards.Harmony
 {
-    [HarmonyPatch(typeof(Saber))]
-    [HarmonyPatch("ManualUpdate")]
+    [HarmonyPatch(typeof(VRController))]
+    [HarmonyPatch("UpdatePositionAndRotation")]
 
-    public class SaberManagerUpdatePatch
+    public class VRControllerUpdatePatch
     {
         static bool Prefix()
         {
@@ -23,7 +23,7 @@ namespace BeatBoards.Harmony
             {
                 return false;
             }
-            return false;
+            return true;
         }
     }
 }

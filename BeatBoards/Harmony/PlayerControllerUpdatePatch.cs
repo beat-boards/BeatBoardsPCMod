@@ -18,6 +18,38 @@ namespace BeatBoards.Harmony
     {
         static void Postfix(ref Saber ____leftSaber, ref Saber ____rightSaber)
         {
+            if (ReplayManager.Instance.recording == true && ReplayManager.Instance.gameObjectActive == true)
+            {
+                Vector3 leftSaberPos = ____leftSaber.transform.position;
+                Vector3 leftSaberRot = ____leftSaber.transform.rotation.eulerAngles;
+                Vector3 rightSaberPos = ____rightSaber.transform.position;
+                Vector3 rightSaberRot = ____rightSaber.transform.rotation.eulerAngles;
+
+                ReplayManager.Instance.positionData.Add(new PositionData()
+                {
+                    SongTime = (float)Math.Round(ReplayManager.Instance.audioTimeSyncController.songTime, 2),
+                    LeftSaber = new SaberData()
+                    {
+                        PositionX = leftSaberPos.x,
+                        PositionY = leftSaberPos.y,
+                        PositionZ = leftSaberPos.z,
+                        RotationX = leftSaberRot.x,
+                        RotationY = leftSaberRot.y,
+                        RotationZ = leftSaberRot.z
+                    },
+                    RightSaber = new SaberData()
+                    {
+                        PositionX = rightSaberPos.x,
+                        PositionY = rightSaberPos.y,
+                        PositionZ = rightSaberPos.z,
+                        RotationX = rightSaberRot.x,
+                        RotationY = rightSaberRot.y,
+                        RotationZ = rightSaberRot.z
+                    }
+
+                });
+            }
+
             if (ReplayManager.Instance.playback == true && ReplayManager.Instance.gameObjectActive == true)
             {
                 float songTime = (float)Math.Round(ReplayManager.Instance.audioTimeSyncController.songTime, 2);
