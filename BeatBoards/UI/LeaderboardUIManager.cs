@@ -8,6 +8,11 @@ using CustomUI.Utilities;
 using UnityEngine.UI;
 using CustomUI.BeatSaber;
 using CustomUI.MenuButton;
+using System.IO;
+using BeatBoards.Replays;
+using Newtonsoft.Json;
+using HMUI;
+using VRUI;
 
 namespace BeatBoards.UI
 {
@@ -35,13 +40,11 @@ namespace BeatBoards.UI
         public Sprite PCIcon { get { if (_PCIcon == null) { _PCIcon = UIUtilities.LoadSpriteFromResources("BeatBoards.Media.icon_pc1.png"); } return _PCIcon; } }
         List<string> varioususernames = new List<string>() { "Taichi", "Logantheobald, Rank 5 in the world on Beat Saber", "Auros", "Assistant", "Megalon", "elliottate", "Klouder", "OrangeW", "Umbranox", "joelseph", "Beige", "Range", "Sam", "DeeJay", "andruzzzhka", "Arti", "DaNike", "emulamer", "halsafar", "ikeiwa", "monkeymanboy", "Moon", "Nova", "raftario", "Ruu | LIV", "ragesaq darth maul", "Reaxt", "Thanos" };
         public Button replaysButton;
-        public string currentlySelectedReplay = "411622272";
+        public string currentlySelectedReplay;
         IDifficultyBeatmap currentlySelectedBeatmap;
 
         public void Init()
         {
-            
-
             eventManager = Events.Instance;
             eventManager.leaderboardOpened += LeaderboardOpened_Event;
             _ = PCIcon;
@@ -87,9 +90,9 @@ namespace BeatBoards.UI
             arg2.SetScores(scoreData, 100);
 
 
-            Replays.ReplayManager.Instance.currentLevelHash = currentlySelectedBeatmap.level.levelID;
-            Replays.ReplayManager.Instance.currentDifficulty = currentlySelectedBeatmap.difficulty.ToString();
-            Replays.ReplayManager.Instance.selectedReplay = currentlySelectedReplay;
+            ReplayManager.Instance.currentLevelHash = currentlySelectedBeatmap.level.levelID;
+            ReplayManager.Instance.currentDifficulty = currentlySelectedBeatmap.difficulty.ToString();
+            ReplayManager.Instance.selectedReplay = currentlySelectedReplay;
         }
 
         public void ReplayMenu()
@@ -98,20 +101,47 @@ namespace BeatBoards.UI
             var viewController = BeatSaberUI.CreateViewController<CustomListViewController>();
             replaySelectionMenu.SetRightViewController(viewController, true, (firstActivation, type) =>
             {
-                viewController.Data.Add(new CustomCellInfo("eggs", "i never used list cells before", PCIcon));
+                List<PositionDataSet> posDataSet = new List<PositionDataSet>() { };
+                if (Directory.Exists(Environment.CurrentDirectory.Replace('\\', '/') + "/UserData/Replays/" + currentlySelectedBeatmap.level.levelID))
+                {
+                    foreach (string file in Directory.GetFiles(Environment.CurrentDirectory.Replace('\\', '/') + "/UserData/Replays/" + currentlySelectedBeatmap.level.levelID))
+                    {
+                        posDataSet.Add(JsonConvert.DeserializeObject<PositionDataSet>(File.ReadAllText(file)));
+                    }
+                    foreach (PositionDataSet posDataS in posDataSet)
+                    {
+                        if (posDataS.Difficulty == currentlySelectedBeatmap.difficulty.ToString())
+                            viewController.Data.Add(new CustomCellInfo(posDataS.Hash, posDataS.Date, PCIcon));
+                    }
+                }
+                else
+                {
+                    viewController.CreateText("No Replays Found", new Vector2(0, 0));
+                }
+
                 viewController._customListTableView.ReloadData();
+                viewController._customListTableView.didSelectCellWithIdxEvent += (tV, id) =>
+                {
+                    currentlySelectedReplay = posDataSet[id].Hash;
+                };
 
-                var button = viewController.CreateUIButton("OkButton", new Vector2(20f, 20f));
-                button.onClick.AddListener(delegate { Replays.ReplayManager.Instance.recording = true; Replays.ReplayManager.Instance.playback = false; });
-                button.SetButtonText("record");
+                var button = viewController.CreateUIButton("OkButton", new Vector2(35f, 20f));
+                button.onClick.AddListener(delegate { ReplayManager.Instance.recording = true; ReplayManager.Instance.playback = false; });
+                button.SetButtonText("Record");
+                button.ToggleWordWrapping(false);
+                button.SetButtonTextSize(3);
 
-                var button2 = viewController.CreateUIButton("OkButton", new Vector2(20f, 0f));
-                button2.onClick.AddListener(delegate { Replays.ReplayManager.Instance.recording = false; Replays.ReplayManager.Instance.playback = true; });
-                button2.SetButtonText("playback");
+                var button2 = viewController.CreateUIButton("OkButton", new Vector2(35f, 0f));
+                button2.onClick.AddListener(delegate { ReplayManager.Instance.recording = false; ReplayManager.Instance.playback = true; });
+                button2.SetButtonText("Playback");
+                button2.ToggleWordWrapping(false);
+                button2.SetButtonTextSize(3);
 
-                var button3 = viewController.CreateUIButton("OkButton", new Vector2(20f, -20f));
-                button3.onClick.AddListener(delegate { Replays.ReplayManager.Instance.recording = false; Replays.ReplayManager.Instance.playback = false; });
-                button3.SetButtonText("neither");
+                var button3 = viewController.CreateUIButton("OkButton", new Vector2(35f, -20f));
+                button3.onClick.AddListener(delegate { ReplayManager.Instance.recording = false; ReplayManager.Instance.playback = false; });
+                button3.SetButtonText("Neither");
+                button3.ToggleWordWrapping(false);
+                button3.SetButtonTextSize(3);
 
             });
             replaySelectionMenu.Present();
