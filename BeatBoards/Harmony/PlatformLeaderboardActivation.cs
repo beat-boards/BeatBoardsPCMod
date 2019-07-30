@@ -29,7 +29,7 @@ namespace BeatBoards.Harmony
             replayButton.ToggleWordWrapping(false);
             replayButton.SetButtonText("Replays");
             replayButton.SetButtonTextSize(3);
-            replayButton.onClick.AddListener(LeaderboardUIManager.Instance.ReplayMenu);
+            //replayButton.onClick.AddListener(LeaderboardUIManager.Instance.ReplayMenu);
 
             LeaderboardUIManager.Instance.replaysButton = replayButton;
         }

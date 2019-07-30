@@ -9,10 +9,14 @@ using UnityEngine.UI;
 using CustomUI.BeatSaber;
 using CustomUI.MenuButton;
 using System.IO;
-using BeatBoards.Replays;
+
 using Newtonsoft.Json;
 using HMUI;
 using VRUI;
+using UnityEngine.Networking;
+using System.Collections;
+using BeatBoards.Utilities;
+using System.Threading.Tasks;
 
 namespace BeatBoards.UI
 {
@@ -41,7 +45,79 @@ namespace BeatBoards.UI
         List<string> varioususernames = new List<string>() { "Taichi", "Logantheobald, Rank 5 in the world on Beat Saber", "Auros", "Assistant", "Megalon", "elliottate", "Klouder", "OrangeW", "Umbranox", "joelseph", "Beige", "Range", "Sam", "DeeJay", "andruzzzhka", "Arti", "DaNike", "emulamer", "halsafar", "ikeiwa", "monkeymanboy", "Moon", "Nova", "raftario", "Ruu | LIV", "ragesaq darth maul", "Reaxt", "Thanos" };
         public Button replaysButton;
         public string currentlySelectedReplay;
+        LeaderboardTableView currentLeaderboard;
         IDifficultyBeatmap currentlySelectedBeatmap;
+        public APIModels.LiteMap mapData = new APIModels.LiteMap() { };
+        public List<APIModels.Score> scores = new List<APIModels.Score>() { };
+        public Dictionary<APIModels.Score, APIModels.User> userScoreDictionary = new Dictionary<APIModels.Score, APIModels.User>() { };
+
+        IEnumerator GetMapData(string levelhash, BeatmapDifficulty difficulty) //TODO Phase out and calculate map data locally
+        {
+            UnityWebRequest www = UnityWebRequest.Get("http://beatboards.net/api/litemap?levelhash=" + levelhash + "&difficulty=" + difficulty);
+            yield return www.SendWebRequest();
+
+            if (www.isNetworkError || www.isHttpError)
+            {
+                Logger.Log.Error(www.error);
+                yield return new WaitForSeconds(.05f);
+            }
+            else
+            {
+                mapData = JsonConvert.DeserializeObject<List<APIModels.LiteMap>>(www.downloadHandler.text).First();
+                UnityWebRequest www2 = UnityWebRequest.Get("http://beatboards.net/api/scores?maphash=" + mapData.MapHash);
+                yield return www2.SendWebRequest();
+
+                if (www2.isNetworkError || www2.isHttpError)
+                {
+                    Logger.Log.Error(www2.error);
+                    yield return new WaitForSeconds(.05f);
+                }
+                else
+                {
+                    scores = JsonConvert.DeserializeObject<List<APIModels.Score>>(www2.downloadHandler.text);
+                    userScoreDictionary = new Dictionary<APIModels.Score, APIModels.User>();
+                    foreach (var score in scores)
+                    {
+                        Logger.Log.Info("http://beatboards.net/api/users?platformID=" + score.UserID);
+                        UnityWebRequest www3 = UnityWebRequest.Get("http://beatboards.net/api/users?platformID=" + score.UserID);
+                        yield return www3.SendWebRequest();
+
+                        if (www3.isNetworkError || www3.isHttpError)
+                        {
+                            Logger.Log.Error(www3.error);
+                            yield return new WaitForSeconds(.05f);
+                        }
+                        else
+                        {
+                            userScoreDictionary.Add(score, JsonConvert.DeserializeObject<List<APIModels.User>>(www3.downloadHandler.text).First());
+                        }
+                    }
+                    ProcessData();
+                }
+            }
+        }
+
+        public void ProcessData()
+        {
+            
+            List<LeaderboardTableView.ScoreData> lscoreData = new List<LeaderboardTableView.ScoreData>();
+            foreach (var dat in userScoreDictionary)
+            {
+                lscoreData.Add(new LeaderboardTableView.ScoreData(dat.Key.AdjustedScore, $"{dat.Value.UserData.Nickname} <size=70%>(<color=#bf42f5>{dat.Key.RawPercent}%</color> - <color=#00ffff>{Math.Round(dat.Key.RawPercent * 1.3, 2)}RP</color>)</size><size=40%> Global: {dat.Value.Rank}</size>", 0, false));
+            }
+            lscoreData = lscoreData.OrderByDescending(o => o.score).ToList();
+            List<LeaderboardTableView.ScoreData> ldisplayData = new List<LeaderboardTableView.ScoreData>();
+            int rank = 1;
+            foreach (var dat in lscoreData)
+            {
+                ldisplayData.Add(new LeaderboardTableView.ScoreData(dat.score, dat.playerName, rank, false));
+                rank++;
+            }
+
+            Logger.Log.Info("e");
+
+            currentLeaderboard.SetScores(ldisplayData, -1);
+        }
 
         public void Init()
         {
@@ -75,76 +151,14 @@ namespace BeatBoards.UI
             }
             return scoreData;
         }
+        
 
         private void LeaderboardOpened_Event(IDifficultyBeatmap arg1, LeaderboardTableView arg2)
         {
+            currentLeaderboard = arg2;
+            StartCoroutine(GetMapData(arg1.level.levelID, arg1.difficulty));
             currentlySelectedBeatmap = arg1;
-            List<LeaderboardTableView.ScoreData> scoreData = new List<LeaderboardTableView.ScoreData>() { };
-            var scda = RandomLeaderboardData().OrderByDescending(a => a.score).ToList();
-            int rank = 1;
-            foreach (var data in scda)
-            {
-                scoreData.Add(new LeaderboardTableView.ScoreData(data.score, data.playerName, rank, data.fullCombo));
-                rank++;
-            }
-            arg2.SetScores(scoreData, 100);
 
-
-            ReplayManager.Instance.currentLevelHash = currentlySelectedBeatmap.level.levelID;
-            ReplayManager.Instance.currentDifficulty = currentlySelectedBeatmap.difficulty.ToString();
-            ReplayManager.Instance.selectedReplay = currentlySelectedReplay;
-        }
-
-        public void ReplayMenu()
-        {
-            var replaySelectionMenu = BeatSaberUI.CreateCustomMenu<CustomMenu>("Replays");
-            var viewController = BeatSaberUI.CreateViewController<CustomListViewController>();
-            replaySelectionMenu.SetRightViewController(viewController, true, (firstActivation, type) =>
-            {
-                List<PositionDataSet> posDataSet = new List<PositionDataSet>() { };
-                if (Directory.Exists(Environment.CurrentDirectory.Replace('\\', '/') + "/UserData/Replays/" + currentlySelectedBeatmap.level.levelID))
-                {
-                    foreach (string file in Directory.GetFiles(Environment.CurrentDirectory.Replace('\\', '/') + "/UserData/Replays/" + currentlySelectedBeatmap.level.levelID))
-                    {
-                        posDataSet.Add(JsonConvert.DeserializeObject<PositionDataSet>(File.ReadAllText(file)));
-                    }
-                    foreach (PositionDataSet posDataS in posDataSet)
-                    {
-                        if (posDataS.Difficulty == currentlySelectedBeatmap.difficulty.ToString())
-                            viewController.Data.Add(new CustomCellInfo(posDataS.Hash, posDataS.Date, PCIcon));
-                    }
-                }
-                else
-                {
-                    viewController.CreateText("No Replays Found", new Vector2(0, 0));
-                }
-
-                viewController._customListTableView.ReloadData();
-                viewController._customListTableView.didSelectCellWithIdxEvent += (tV, id) =>
-                {
-                    currentlySelectedReplay = posDataSet[id].Hash;
-                };
-
-                var button = viewController.CreateUIButton("OkButton", new Vector2(35f, 20f));
-                button.onClick.AddListener(delegate { ReplayManager.Instance.recording = true; ReplayManager.Instance.playback = false; });
-                button.SetButtonText("Record");
-                button.ToggleWordWrapping(false);
-                button.SetButtonTextSize(3);
-
-                var button2 = viewController.CreateUIButton("OkButton", new Vector2(35f, 0f));
-                button2.onClick.AddListener(delegate { ReplayManager.Instance.recording = false; ReplayManager.Instance.playback = true; });
-                button2.SetButtonText("Playback");
-                button2.ToggleWordWrapping(false);
-                button2.SetButtonTextSize(3);
-
-                var button3 = viewController.CreateUIButton("OkButton", new Vector2(35f, -20f));
-                button3.onClick.AddListener(delegate { ReplayManager.Instance.recording = false; ReplayManager.Instance.playback = false; });
-                button3.SetButtonText("Neither");
-                button3.ToggleWordWrapping(false);
-                button3.SetButtonTextSize(3);
-
-            });
-            replaySelectionMenu.Present();
         }
     }
 }

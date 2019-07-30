@@ -21,11 +21,11 @@ namespace BeatBoards.Harmony
                 IconSegmentedControl.DataItem thirdCell = ____scopeSegmentedControl.GetPrivateField<IconSegmentedControl.DataItem[]>("_dataItems").Last();
                 thirdCell.SetPrivateProperty("hintText", "Platform: PC");
                 thirdCell.SetPrivateProperty("icon", LeaderboardUIManager.Instance.PCIcon);
-                //____scopeSegmentedControl.ReloadData();
 
                 ____hasScoresData = false;
                 ____scores.Clear();
                 ____leaderboardTableView.SetScores(____scores, ____playerScorePos[(int)____scoresScope]);
+
                 Events.Instance.leaderboardOpened.Invoke(____difficultyBeatmap, ____leaderboardTableView);
                 return false;
 

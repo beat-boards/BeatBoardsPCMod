@@ -66,6 +66,10 @@
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Beat Saber\Beat Saber_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.ImageConversionModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Beat Saber\Beat Saber_Data\Managed\UnityEngine.ImageConversionModule.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.UI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
     <Reference Include="UnityEngine.UIModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -83,17 +87,23 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Beat Saber\Beat Saber_Data\Managed\UnityEngine.VRModule.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.XRModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Beat Saber\Beat Saber_Data\Managed\UnityEngine.XRModule.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\Events.cs" />
     <Compile Include="Core\Plugin.cs" />
-    <Compile Include="Harmony\PlayerControllerUpdatePatch.cs" />
     <Compile Include="Harmony\PlatformLeaderboardActivation.cs" />
     <Compile Include="Harmony\PlatformLeaderboardPatch.cs" />
-    <Compile Include="Harmony\VRControllerUpdatePatch.cs" />
+    <Compile Include="Harmony\VRControllerPatch.cs" />
     <Compile Include="Replays\ReplayManager.cs" />
     <Compile Include="UI\BeatBoardsMenu.cs" />
+    <Compile Include="UI\Keyboard.cs" />
+    <Compile Include="UI\KeyboardViewController.cs" />
     <Compile Include="UI\LeaderboardUIManager.cs" />
+    <Compile Include="Utilities\APIModels.cs" />
     <Compile Include="Utilities\Conversions.cs" />
     <Compile Include="Utilities\Logger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
