@@ -94,6 +94,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\Events.cs" />
+    <Compile Include="Core\Global.cs" />
     <Compile Include="Core\Plugin.cs" />
     <Compile Include="Harmony\PlatformLeaderboardActivation.cs" />
     <Compile Include="Harmony\PlatformLeaderboardPatch.cs" />

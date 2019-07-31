@@ -39,23 +39,14 @@ namespace BeatBoards.Core
             SceneManager.activeSceneChanged -= ActiveSceneChanged;
         }
 
+        public Action IDSet;
         public Action levelStarted;
         public Action<IDifficultyBeatmap, LeaderboardTableView> leaderboardOpened;
+        
 
         private void ActiveSceneChanged(Scene oldScene, Scene newScene)
         {
-            //if (newScene.name == "GameCore")
-            //{
-            //    _ = Replays.ReplayManager.Instance;
-            //    levelStarted.Invoke();
-            //}
-            //if (newScene.name == "MenuCore")
-            //{
-            //    if (oldScene.name == "GameCore")
-            //    {
-            //        Destroy(Replays.ReplayManager.Instance);
-            //    }
-            //}
+
         }
     }
 }

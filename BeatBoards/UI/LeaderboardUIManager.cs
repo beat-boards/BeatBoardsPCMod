@@ -51,6 +51,27 @@ namespace BeatBoards.UI
         public List<APIModels.Score> scores = new List<APIModels.Score>() { };
         public Dictionary<APIModels.Score, APIModels.User> userScoreDictionary = new Dictionary<APIModels.Score, APIModels.User>() { };
 
+        IEnumerator SetID(string url)
+        {
+            UnityWebRequest www = UnityWebRequest.Get(url);
+            yield return www.SendWebRequest();
+
+            if (www.isNetworkError || www.isHttpError)
+            {
+                Logger.Log.Error(www.error);
+                Global.BeatBoardsID = "0";
+            }
+            else
+            {
+                APIModels.User user = JsonConvert.DeserializeObject<APIModels.User[]>(www.downloadHandler.text).First();
+                if (user.BeatBoardsID.Length > 3)
+                {
+                    Global.BeatBoardsID = user.BeatBoardsID;
+                }
+                    
+            }
+        }
+
         IEnumerator GetMapData(string levelhash, BeatmapDifficulty difficulty) //TODO Phase out and calculate map data locally
         {
             UnityWebRequest www = UnityWebRequest.Get("http://beatboards.net/api/litemap?levelhash=" + levelhash + "&difficulty=" + difficulty);
@@ -122,6 +143,7 @@ namespace BeatBoards.UI
         public void Init()
         {
             eventManager = Events.Instance;
+            StartCoroutine(SetID("http://beatboards.net/api/users?platformID=" + BS_Utils.Gameplay.GetUserInfo.GetUserID()));
             eventManager.leaderboardOpened += LeaderboardOpened_Event;
             _ = PCIcon;
         }
@@ -155,6 +177,8 @@ namespace BeatBoards.UI
 
         private void LeaderboardOpened_Event(IDifficultyBeatmap arg1, LeaderboardTableView arg2)
         {
+            StopAllCoroutines();
+
             currentLeaderboard = arg2;
             StartCoroutine(GetMapData(arg1.level.levelID, arg1.difficulty));
             currentlySelectedBeatmap = arg1;

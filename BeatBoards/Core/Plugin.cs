@@ -43,7 +43,7 @@ namespace BeatBoards
             if (nextScene.name == "EmptyTransition")
             {
                 _ = Core.Events.Instance;
-                _ = UI.LeaderboardUIManager.Instance;
+                _ = LeaderboardUIManager.Instance;
             }
         }
 

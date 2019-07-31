@@ -19,6 +19,7 @@ namespace BeatBoards.UI
     {
         public static void Load() { new GameObject("BeatBoards: Menu Manager").AddComponent<BeatBoardsMenu>(); }
 
+
         public TextMeshProUGUI loadingText;
         public CustomMenu beatBoardsMenu;
         public CustomMenu keyboardMenu;
@@ -36,15 +37,16 @@ namespace BeatBoards.UI
         private Button _editNameButton;
         private Button _editIconButton;
 
-        //private Sprite _userID;
 
         private void Awake()
         {
-
+            
         }
 
         private void Start()
         {
+
+
             beatBoardsMenu = BeatSaberUI.CreateCustomMenu<CustomMenu>("Beat BoardS");
             keyboardMenu = BeatSaberUI.CreateCustomMenu<CustomMenu>("Account Change");
             mainViewController = BeatSaberUI.CreateViewController<CustomViewController>();
@@ -65,18 +67,32 @@ namespace BeatBoards.UI
             _roleText = BeatSaberUI.CreateText(mainViewController.rectTransform, "", new Vector2(-35, -30));
             _roleText.alignment = TextAlignmentOptions.BaselineLeft;
 
-            _editNameButton = BeatSaberUI.CreateUIButton(mainViewController.rectTransform, "OkButton", new Vector2(60, 5));
+            _editNameButton = BeatSaberUI.CreateUIButton(mainViewController.rectTransform, "OkButton", new Vector2(60, 10));
             _editNameButton.ToggleWordWrapping(false);
-            _editIconButton = BeatSaberUI.CreateUIButton(mainViewController.rectTransform, "OkButton", new Vector2(60, -5));
+            _editIconButton = BeatSaberUI.CreateUIButton(mainViewController.rectTransform, "OkButton", new Vector2(60, -10));
             _editIconButton.ToggleWordWrapping(false);
+
+            mainViewController.backButtonPressed += MenuExited;
 
             Fetch();
         }
 
+        private void MenuExited()
+        {
+            mainViewController.backButtonPressed -= MenuExited;
+            Cleanup();
+        }
+
         private void Fetch()
         {
+            if (Core.Global.BeatBoardsID == "0" || Core.Global.BeatBoardsID.Length < 3)
+            {
+                loadingText.SetText("User Not Found. Play your first song or check your internet!");
+                return;
+            }
+
             loadingText.SetText("Fetching Data...");
-            SharedCoroutineStarter.instance.StartCoroutine(GetData("http://beatboards.net/api/users?platformID=" + "12198"));//BS_Utils.Gameplay.GetUserInfo.GetUserID()));
+            SharedCoroutineStarter.instance.StartCoroutine(GetData("http://beatboards.net/api/users?beatboardsID=" + Core.Global.BeatBoardsID));
         }
 
         IEnumerator GetData(string url)
@@ -106,7 +122,7 @@ namespace BeatBoards.UI
                 if (role == "Owner") role = "<color=#00ffff>Owner</color>";
                 else if (role == "Curator") role = "<color=#34ebb1>Curator</color>";
 
-                PresentData(user.PlatformID, user.UserData.Nickname, status, user.RankPoints.ToString(), rank, role, user.UserData.Image);
+                PresentData(user.BeatBoardsID, user.UserData.Nickname, status, user.RankPoints.ToString(), rank, role, user.UserData.Image);
             }
         }
 
@@ -121,9 +137,6 @@ namespace BeatBoards.UI
                 _rankPointsText.SetText("<b>Rank Points:</b> " + rankpoints);
                 _rankText.SetText("<b>Global Rank:</b> " + globalrank);
                 _roleText.SetText("<b>Role:</b> " + role);
-
-                //UtilityManager.Instance.CreateImageFromURL("https://avatars0.githubusercontent.com/u/41306347");
-
                 var _userImage = new GameObject("BeatBoards: User Image").AddComponent<RawImage>();
                 _userImage.material = CustomUI.Utilities.UIUtilities.NoGlowMaterial;
                 _userImage.rectTransform.sizeDelta = new Vector2(28f, 28f);
@@ -177,7 +190,7 @@ namespace BeatBoards.UI
 
         public void Cleanup()
         {
-
+            Destroy(this);
         }
     }
 }

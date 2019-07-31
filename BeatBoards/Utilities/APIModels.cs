@@ -14,6 +14,7 @@ namespace BeatBoards.Utilities
             public string[] Following { get; set; }
             public Platform Platform { get; set; }
             public string PlatformID { get; set; }
+            public string BeatBoardsID { get; set; }
             public float RankPoints { get; set; }
             public int Rank { get; set; }
             public string Role { get; set; }
