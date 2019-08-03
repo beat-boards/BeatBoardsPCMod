@@ -20,7 +20,7 @@ namespace BeatBoards.Harmony
             {
                 IconSegmentedControl.DataItem thirdCell = ____scopeSegmentedControl.GetPrivateField<IconSegmentedControl.DataItem[]>("_dataItems").Last();
                 thirdCell.SetPrivateProperty("hintText", "Platform: PC");
-                thirdCell.SetPrivateProperty("icon", LeaderboardUIManager.Instance.PCIcon);
+                thirdCell.SetPrivateProperty("icon", BeatBoardsUIManager.Instance.PCIcon);
 
                 ____hasScoresData = false;
                 ____scores.Clear();

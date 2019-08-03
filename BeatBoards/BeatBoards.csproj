@@ -101,9 +101,16 @@
     <Compile Include="Harmony\VRControllerPatch.cs" />
     <Compile Include="Replays\ReplayManager.cs" />
     <Compile Include="UI\BeatBoardsMenu.cs" />
+    <Compile Include="UI\FlowCoordinators\BeatBoardsMenuFlowCoordinator.cs" />
     <Compile Include="UI\Keyboard.cs" />
     <Compile Include="UI\KeyboardViewController.cs" />
-    <Compile Include="UI\LeaderboardUIManager.cs" />
+    <Compile Include="UI\BeatBoardsUIManager.cs" />
+    <Compile Include="UI\UIElements\Keyboard.cs" />
+    <Compile Include="UI\ViewControllers\BackButtonNavigationController.cs" />
+    <Compile Include="UI\ViewControllers\FriendsListViewController.cs" />
+    <Compile Include="UI\ViewControllers\ImageUploadViewController.cs" />
+    <Compile Include="UI\ViewControllers\KeyboardViewController.cs" />
+    <Compile Include="UI\ViewControllers\PlayerInfoViewController.cs" />
     <Compile Include="Utilities\APIModels.cs" />
     <Compile Include="Utilities\Conversions.cs" />
     <Compile Include="Utilities\Logger.cs" />
@@ -116,6 +123,7 @@
   <ItemGroup>
     <EmbeddedResource Include="Media\icon_pc1.png" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>copy /Y "$(TargetDir)$(TargetName).dll" "C:\Program Files (x86)\Steam\steamapps\common\Beat Saber\Plugins\$(TargetName).dll"</PostBuildEvent>

@@ -22,7 +22,7 @@ namespace BeatBoards.Harmony
             ____scopeSegmentedControl.SetData(new IconSegmentedControl.DataItem[] {
                 new IconSegmentedControl.DataItem(____globalLeaderboardIcon, "Global"),
                 new IconSegmentedControl.DataItem(____aroundPlayerLeaderboardIcon, "Around You"),
-                new IconSegmentedControl.DataItem(LeaderboardUIManager.Instance.PCIcon, "Platform: PC")
+                new IconSegmentedControl.DataItem(BeatBoardsUIManager.Instance.PCIcon, "Platform: PC")
             });
 
             var replayButton = __instance.CreateUIButton("OkButton", new Vector2(0f, -37f), new Vector2(9.0f, 5.0f));
@@ -31,7 +31,7 @@ namespace BeatBoards.Harmony
             replayButton.SetButtonTextSize(3);
             //replayButton.onClick.AddListener(LeaderboardUIManager.Instance.ReplayMenu);
 
-            LeaderboardUIManager.Instance.replaysButton = replayButton;
+            BeatBoardsUIManager.Instance.replaysButton = replayButton;
         }
     }
 }

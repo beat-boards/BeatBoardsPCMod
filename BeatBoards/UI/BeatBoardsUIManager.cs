@@ -17,13 +17,14 @@ using UnityEngine.Networking;
 using System.Collections;
 using BeatBoards.Utilities;
 using System.Threading.Tasks;
+using BeatBoards.UI.FlowCoordinators;
 
 namespace BeatBoards.UI
 {
-    public class LeaderboardUIManager : MonoBehaviour
+    public class BeatBoardsUIManager : MonoBehaviour
     {
-        private static LeaderboardUIManager _instance;
-        public static LeaderboardUIManager Instance
+        private static BeatBoardsUIManager _instance;
+        public static BeatBoardsUIManager Instance
         {
             get
             {
@@ -31,7 +32,7 @@ namespace BeatBoards.UI
                 {
                     Logger.Log.Info("Initializing: BeatBoards Leaderboard UI Manager");
                     GameObject eventsGameObject = new GameObject("BeatBoards: Leaderboard UI Manager Singleton");
-                    _instance = eventsGameObject.AddComponent<LeaderboardUIManager>();
+                    _instance = eventsGameObject.AddComponent<BeatBoardsUIManager>();
                     DontDestroyOnLoad(eventsGameObject);
                     _instance.Init();
                 }
@@ -183,6 +184,18 @@ namespace BeatBoards.UI
             StartCoroutine(GetMapData(arg1.level.levelID, arg1.difficulty));
             currentlySelectedBeatmap = arg1;
 
+        }
+
+        // other thing
+
+        public BeatBoardsMenuFlowCoordinator bbmFlowCoordinator;
+
+        public void BeatBoardsButtonPressed()
+        {
+            if (bbmFlowCoordinator == null)
+                bbmFlowCoordinator = new GameObject("BeatBoards: Flow Coordinator").AddComponent<BeatBoardsMenuFlowCoordinator>();
+            MainFlowCoordinator mainFlow = Resources.FindObjectsOfTypeAll<MainFlowCoordinator>().First();
+            mainFlow.InvokeMethod("PresentFlowCoordinator", bbmFlowCoordinator, null, false, false);
         }
     }
 }

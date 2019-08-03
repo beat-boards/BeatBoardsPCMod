@@ -1,8 +1,13 @@
 ﻿using BeatBoards.UI;
+using BeatBoards.UI.FlowCoordinators;
 using BeatBoards.Utilities;
+using CustomUI.BeatSaber;
 using CustomUI.MenuButton;
+using CustomUI.Utilities;
 using Harmony;
 using IPA;
+using System.Linq;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 using IPALogger = IPA.Logging.Logger;
 
@@ -14,7 +19,7 @@ namespace BeatBoards
 
         public void Init(IPALogger logger)
         {
-            Logger.Log = logger;
+            Utilities.Logger.Log = logger;
         }
 
         public void OnApplicationStart()
@@ -43,7 +48,7 @@ namespace BeatBoards
             if (nextScene.name == "EmptyTransition")
             {
                 _ = Core.Events.Instance;
-                _ = LeaderboardUIManager.Instance;
+                _ = BeatBoardsUIManager.Instance;
             }
         }
 
@@ -51,7 +56,7 @@ namespace BeatBoards
         {
             if (scene.name == "MenuCore")
             {
-                MenuButtonUI.AddButton("Beat Boards", BeatBoardsMenu.Load);
+                MenuButtonUI.AddButton("Beat Boards", BeatBoardsUIManager.Instance.BeatBoardsButtonPressed);
             }
         }
 
@@ -59,5 +64,10 @@ namespace BeatBoards
         {
 
         }
+
+        
+
+        //MainFlowCoordinator mainFlowCoordinator = Resources.FindObjectsOfTypeAll<MainFlowCoordinator>().First();
+        //mainFlowCoordinator.InvokeMethod("PresentFlowCoordinator", bbmfc, null, null, false);
     }
 }
