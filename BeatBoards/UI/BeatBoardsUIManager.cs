@@ -18,6 +18,7 @@ using System.Collections;
 using BeatBoards.Utilities;
 using System.Threading.Tasks;
 using BeatBoards.UI.FlowCoordinators;
+using TMPro;
 
 namespace BeatBoards.UI
 {
@@ -42,7 +43,11 @@ namespace BeatBoards.UI
 
         Events eventManager;
         private Sprite _PCIcon;
+        private Sprite _upvoteIcon;
+        private Sprite _downvoteIcon;
         public Sprite PCIcon { get { if (_PCIcon == null) { _PCIcon = UIUtilities.LoadSpriteFromResources("BeatBoards.Media.icon_pc1.png"); } return _PCIcon; } }
+        public Sprite UpvoteIcon { get { if (_upvoteIcon == null) { _upvoteIcon = UIUtilities.LoadSpriteFromResources("BeatBoards.Media.Upvote.png"); _upvoteIcon.texture.wrapMode = TextureWrapMode.Clamp; } return _upvoteIcon; } }
+        public Sprite DownvoteIcon { get { if (_downvoteIcon == null) { _downvoteIcon = UIUtilities.LoadSpriteFromResources("BeatBoards.Media.Downvote.png"); _downvoteIcon.texture.wrapMode = TextureWrapMode.Clamp; } return _downvoteIcon; } }
         List<string> varioususernames = new List<string>() { "Taichi", "Logantheobald, Rank 5 in the world on Beat Saber", "Auros", "Assistant", "Megalon", "elliottate", "Klouder", "OrangeW", "Umbranox", "joelseph", "Beige", "Range", "Sam", "DeeJay", "andruzzzhka", "Arti", "DaNike", "emulamer", "halsafar", "ikeiwa", "monkeymanboy", "Moon", "Nova", "raftario", "Ruu | LIV", "ragesaq darth maul", "Reaxt", "Thanos" };
         public Button replaysButton;
         public string currentlySelectedReplay;
@@ -51,6 +56,9 @@ namespace BeatBoards.UI
         public APIModels.LiteMap mapData = new APIModels.LiteMap() { };
         public List<APIModels.Score> scores = new List<APIModels.Score>() { };
         public Dictionary<APIModels.Score, APIModels.User> userScoreDictionary = new Dictionary<APIModels.Score, APIModels.User>() { };
+        private Button _upvoteButton;
+        private Button _downvoteButton;
+        private TextMeshProUGUI _ratingText;
 
         IEnumerator SetID(string url)
         {
@@ -146,12 +154,17 @@ namespace BeatBoards.UI
             eventManager = Events.Instance;
             StartCoroutine(SetID("http://beatboards.net/api/users?platformID=" + BS_Utils.Gameplay.GetUserInfo.GetUserID()));
             eventManager.leaderboardOpened += LeaderboardOpened_Event;
+            BSEvents.levelFailed += LevelFailed;
+            BSEvents.levelCleared += LevelCleared;
             _ = PCIcon;
+            
         }
 
         public void OnDisable()
         {
             eventManager.leaderboardOpened -= LeaderboardOpened_Event;
+            BSEvents.levelFailed -= LevelFailed;
+            BSEvents.levelCleared -= LevelCleared;
         }
 
         private List<LeaderboardTableView.ScoreData> RandomLeaderboardData()
@@ -183,6 +196,34 @@ namespace BeatBoards.UI
             currentLeaderboard = arg2;
             StartCoroutine(GetMapData(arg1.level.levelID, arg1.difficulty));
             currentlySelectedBeatmap = arg1;
+
+        }
+
+        public void AddVotingButtons()
+        {
+            ResultsViewController resultsViewController = Resources.FindObjectsOfTypeAll<ResultsViewController>().First(x => x.name == "StandardLevelResultsViewController");
+
+            _upvoteButton = resultsViewController.CreateUIButton("PracticeButton", new Vector2(-65f, 10f), new Vector2(12f, 12f), () => { VoteForSong(true); }, "", UpvoteIcon);
+            _downvoteButton = resultsViewController.CreateUIButton("PracticeButton", new Vector2(-65f, -10f), new Vector2(12f, 12f), () => { VoteForSong(false); }, "", DownvoteIcon);
+            _ratingText = resultsViewController.CreateText("0", new Vector2(-36.5f, 0f));
+            _ratingText.alignment = TextAlignmentOptions.Center;
+            _ratingText.fontSize = 7f;
+            _ratingText.lineSpacing = -38f;
+
+        }
+
+        private void VoteForSong(bool vote)
+        {
+            Logger.Log.Info(vote.ToString());
+        }
+
+        private void LevelCleared(StandardLevelScenesTransitionSetupDataSO arg1, LevelCompletionResults arg2)
+        {
+
+        }
+
+        private void LevelFailed(StandardLevelScenesTransitionSetupDataSO arg1, LevelCompletionResults arg2)
+        {
 
         }
 

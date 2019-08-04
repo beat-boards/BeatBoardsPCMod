@@ -1,4 +1,5 @@
-﻿using CustomUI.BeatSaber;
+﻿using BeatBoards.UI.UIElements;
+using CustomUI.BeatSaber;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,6 +24,7 @@ namespace BeatBoards.UI.ViewControllers
             //
             if (!initialized && activationType == ActivationType.AddedToHierarchy)
             {
+                
                 RectTransform keyboardRect = new GameObject("SearchKeyboard").AddComponent<RectTransform>();
                 keyboardRect.gameObject.transform.SetParent(rectTransform);
                 keyboardRect.position = rectTransform.position;

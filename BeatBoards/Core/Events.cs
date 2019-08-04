@@ -2,10 +2,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Logger = BeatBoards.Utilities.Logger;
-using UnityEngine.Events;
-using System.Linq;
-using Newtonsoft.Json;
-using System.IO;
+using CustomUI.Utilities;
 
 namespace BeatBoards.Core
 {
@@ -34,9 +31,12 @@ namespace BeatBoards.Core
             SceneManager.activeSceneChanged += ActiveSceneChanged;
         }
 
+        
+
         public void OnDisable()
         {
             SceneManager.activeSceneChanged -= ActiveSceneChanged;
+            
         }
 
         public Action IDSet;
@@ -46,7 +46,7 @@ namespace BeatBoards.Core
 
         private void ActiveSceneChanged(Scene oldScene, Scene newScene)
         {
-
+            
         }
     }
 }

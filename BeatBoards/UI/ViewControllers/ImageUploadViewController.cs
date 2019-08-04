@@ -13,10 +13,11 @@ namespace BeatBoards.UI.ViewControllers
 {
     class ImageUploadViewController : CustomViewController
     {
-        private TextMeshProUGUI _statusText;
+        public TextMeshProUGUI _statusText;
         private Button _refreshButton;
-        private Button _setButton;
+        public Button _setButton;
         private Button _closeButton;
+        public TextMeshProUGUI _titleText;
 
         public Action refreshButtonClicked;
         public Action setButtonClicked;
@@ -28,7 +29,17 @@ namespace BeatBoards.UI.ViewControllers
 
             if (activationType == ActivationType.AddedToHierarchy)
             {
-                _statusText = BeatSaberUI.CreateText(rectTransform, "Place a .jpg or .png in <u>UserData/BeatBoards/ProfilePicture</u>\nMaximum file size: <color=red>2MB</color>", new Vector2(0, 0));
+                if (_titleText == null)
+                {
+                    RectTransform viewControllersContainer = FindObjectsOfType<RectTransform>().First(x => x.name == "ViewControllers");
+                    var headerPanelRectTransform = Instantiate(viewControllersContainer.GetComponentsInChildren<RectTransform>(true).First(x => x.name == "HeaderPanel" && x.parent.name == "PlayerSettingsViewController"), rectTransform);
+                    headerPanelRectTransform.name = "BeatBoards: Header";
+                    headerPanelRectTransform.gameObject.SetActive(true);
+                    _titleText = headerPanelRectTransform.GetComponentInChildren<TextMeshProUGUI>();
+                    _titleText.text = "Change Profile Picture";
+                }
+
+                _statusText = BeatSaberUI.CreateText(rectTransform, "Place a .jpg or .png in <u>UserData/BeatBoards/ProfilePicture</u>\nMaximum file size: <color=red>100KB</color>\nNo File Found.", new Vector2(0, 0));
                 _statusText.alignment = TextAlignmentOptions.Center;
 
                 _refreshButton = BeatSaberUI.CreateUIButton(rectTransform, "OkButton", new Vector2(0, -30));

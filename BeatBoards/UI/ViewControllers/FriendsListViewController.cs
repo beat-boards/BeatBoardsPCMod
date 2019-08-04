@@ -24,7 +24,7 @@ namespace BeatBoards.UI.ViewControllers
         public Button RemoveFollowerButton;
         public Button AddFollowerButton;
 
-        
+        public Action AddFriendButtonPressed;
 
         public override void __Activate(ActivationType activationType)
         {
@@ -48,7 +48,7 @@ namespace BeatBoards.UI.ViewControllers
 
                 Followers.Clear();
                 Data.Clear();
-                SetContent(new List<Following>() { new Following() { Uuid = "cc0d001a-9441-4768-a5e8-56f0e2e612a4", Country = "US", Fails = 45, Rank = 2, RankingPoints = 910.42f, Role = Role.Owner, Username = "raftario" } });
+                SetContent(new List<Following>() { new Following() { Uuid = "cc0d001a-9441-4768-a5e8-56f0e2e612a4", Country = "CA", Fails = 45, Rank = 2, RankingPoints = 910.42f, Role = Role.Owner, Username = "raftario" } });
                 
             }
             else
@@ -59,27 +59,28 @@ namespace BeatBoards.UI.ViewControllers
 
         private void FriendSelected(TableView arg1, int arg2)
         {
+            
+            _lastSelectedRow = arg2;
             RemoveFollowerButton.interactable = true;
         }
 
         public void CreateButtons()
         {
-            AddFollowerButton = BeatSaberUI.CreateUIButton(rectTransform, "OkButton", new Vector2(37, 30));
+            AddFollowerButton = BeatSaberUI.CreateUIButton(rectTransform, "OkButton", new Vector2(43, 30));
             AddFollowerButton.ToggleWordWrapping(false);
             AddFollowerButton.SetButtonText("Add");
+            AddFollowerButton.onClick.AddListener(delegate { AddFriendButtonPressed.Invoke(); });
 
-            RemoveFollowerButton = BeatSaberUI.CreateUIButton(rectTransform, "OkButton", new Vector2(37, 20));
+            RemoveFollowerButton = BeatSaberUI.CreateUIButton(rectTransform, "OkButton", new Vector2(43, 20));
             RemoveFollowerButton.ToggleWordWrapping(false);
             RemoveFollowerButton.SetButtonText("Delete");
             RemoveFollowerButton.interactable = false;
+            RemoveFollowerButton.onClick.AddListener(delegate { RemoveFollower(_lastSelectedRow); });
         }
 
         internal void Refresh()
         {
             _customListTableView.ReloadData();
-            if (_lastSelectedRow > -1)
-                _customListTableView.SelectCellWithIdx(_lastSelectedRow);
-            
         }
 
         public void SetContent(List<Following> followers)
@@ -91,7 +92,7 @@ namespace BeatBoards.UI.ViewControllers
 
             foreach (var follower in Followers)
             {
-                Data.Add(new CustomCellInfo(follower.Username, $"Rank: {follower.Rank} | Ranking Points: {follower.RankingPoints}", SpriteGenerator(raftariob64)));
+                Data.Add(new CustomCellInfo(follower.Username, $"Rank: {follower.Rank} | Rank Points: {follower.RankingPoints}", SpriteGenerator(raftariob64)));
             }
 
             _customListTableView.ReloadData();
@@ -105,7 +106,13 @@ namespace BeatBoards.UI.ViewControllers
             _pageDownButton.interactable = pageDownEnabled;
         }
 
-        
+        public void RemoveFollower(int selectedCell)
+        {
+            var toRemove = Followers[selectedCell];
+            Utilities.Logger.Log.Info(toRemove.Country);
+            Followers.Remove(toRemove);
+            Refresh();
+        }
 
         public Sprite SpriteGenerator(string spriteb64)
         {

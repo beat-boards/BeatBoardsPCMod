@@ -26,7 +26,8 @@ namespace BeatBoards.UI.ViewControllers
         private TextMeshProUGUI _rankText;
         private TextMeshProUGUI _roleText;
 
-        private TextMeshProUGUI _titleText;
+        private TextMeshProUGUI _randomText;
+        public TextMeshProUGUI _titleText;
 
         public Button EditNameButton;
         public Button EditProfileButton;
@@ -58,23 +59,31 @@ namespace BeatBoards.UI.ViewControllers
             }
         }
 
+        
+
         private void CreateText()
         {
-            loadingText = BeatSaberUI.CreateText(rectTransform, "", new Vector2(15, 0));
-            loadingText.alignment = TextAlignmentOptions.Center;
+            if (loadingText == null && _identifierText == null && _nameText == null && _accountStatus == null && _rankPointsText == null && _rankText == null && _roleText == null && _randomText == null)
+            {
+                loadingText = BeatSaberUI.CreateText(rectTransform, "", new Vector2(15, 0));
+                loadingText.alignment = TextAlignmentOptions.Center;
 
-            _identifierText = BeatSaberUI.CreateText(rectTransform, "", new Vector2(27, 26));
-            _identifierText.alignment = TextAlignmentOptions.BaselineLeft;
-            _nameText = BeatSaberUI.CreateText(rectTransform, "", new Vector2(27, 20));
-            _nameText.alignment = TextAlignmentOptions.BaselineLeft;
-            _accountStatus = BeatSaberUI.CreateText(rectTransform, "", new Vector2(27, 14));
-            _accountStatus.alignment = TextAlignmentOptions.BaselineLeft;
-            _rankPointsText = BeatSaberUI.CreateText(rectTransform, "", new Vector2(27, 8));
-            _rankPointsText.alignment = TextAlignmentOptions.BaselineLeft;
-            _rankText = BeatSaberUI.CreateText(rectTransform, "", new Vector2(27, 2));
-            _rankText.alignment = TextAlignmentOptions.BaselineLeft;
-            _roleText = BeatSaberUI.CreateText(rectTransform, "", new Vector2(27, -4));
-            _roleText.alignment = TextAlignmentOptions.BaselineLeft;
+                _identifierText = BeatSaberUI.CreateText(rectTransform, "", new Vector2(27, 26));
+                _identifierText.alignment = TextAlignmentOptions.BaselineLeft;
+                _nameText = BeatSaberUI.CreateText(rectTransform, "", new Vector2(27, 20));
+                _nameText.alignment = TextAlignmentOptions.BaselineLeft;
+                _accountStatus = BeatSaberUI.CreateText(rectTransform, "", new Vector2(27, 14));
+                _accountStatus.alignment = TextAlignmentOptions.BaselineLeft;
+                _rankPointsText = BeatSaberUI.CreateText(rectTransform, "", new Vector2(27, 8));
+                _rankPointsText.alignment = TextAlignmentOptions.BaselineLeft;
+                _rankText = BeatSaberUI.CreateText(rectTransform, "", new Vector2(27, 2));
+                _rankText.alignment = TextAlignmentOptions.BaselineLeft;
+                _roleText = BeatSaberUI.CreateText(rectTransform, "", new Vector2(27, -4));
+                _roleText.alignment = TextAlignmentOptions.BaselineLeft;
+
+                _randomText = BeatSaberUI.CreateText(rectTransform, "", new Vector2(0, -23));
+                _randomText.alignment = TextAlignmentOptions.Center;
+            }
 
             _loadingIndicator.SetActive(false);
             FakeData();
@@ -83,17 +92,23 @@ namespace BeatBoards.UI.ViewControllers
 
         private void CreateButtons()
         {
-            EditNameButton = BeatSaberUI.CreateUIButton(rectTransform, "OkButton", new Vector2(-55, 25));
-            EditNameButton.ToggleWordWrapping(false);
-            EditNameButton.SetButtonText("Edit Name");
-            EditNameButton.SetButtonTextSize(4);
-            EditNameButton.onClick.AddListener(delegate { NameButtonPressed.Invoke(_nameText.text); });
-
-            EditProfileButton = BeatSaberUI.CreateUIButton(rectTransform, "OkButton", new Vector2(-55, 15));
-            EditProfileButton.ToggleWordWrapping(false);
-            EditProfileButton.SetButtonText("Change Image");
-            EditProfileButton.SetButtonTextSize(3);
-            EditProfileButton.onClick.AddListener(delegate { ImageButtonPressed.Invoke(); });
+            if (EditNameButton == null)
+            {
+                EditNameButton = BeatSaberUI.CreateUIButton(rectTransform, "OkButton", new Vector2(-55, 25));
+                EditNameButton.ToggleWordWrapping(false);
+                EditNameButton.SetButtonText("Edit Name");
+                EditNameButton.SetButtonTextSize(4);
+                EditNameButton.onClick.AddListener(delegate { NameButtonPressed.Invoke(_nameText.text); });
+            }
+            
+            if (EditProfileButton == null)
+            {
+                EditProfileButton = BeatSaberUI.CreateUIButton(rectTransform, "OkButton", new Vector2(-55, 15));
+                EditProfileButton.ToggleWordWrapping(false);
+                EditProfileButton.SetButtonText("Change Image");
+                EditProfileButton.SetButtonTextSize(3);
+                EditProfileButton.onClick.AddListener(delegate { ImageButtonPressed.Invoke(); });
+            }
         }
 
         private void FakeData()
@@ -103,7 +118,6 @@ namespace BeatBoards.UI.ViewControllers
             _titleText.text = "Auros";
 
             StartCoroutine(MoveProfileAnimation(rawImage));
-
         }
 
         private IEnumerator MoveProfileAnimation(RawImage rawImage)
@@ -128,6 +142,8 @@ namespace BeatBoards.UI.ViewControllers
             _rankPointsText.text = "Ranking Points: 2451.19";
             _rankText.text = "Rank: 1";
             _roleText.text = "Role: <color=#00ffff>Owner</color>";
+
+            _randomText.text = "\"Sometimes, it really do be like that\"\n- Guy 2018";
         }
 
         public RawImage Image(string imageb64, float size = 36)

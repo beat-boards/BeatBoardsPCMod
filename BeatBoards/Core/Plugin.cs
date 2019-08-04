@@ -57,6 +57,7 @@ namespace BeatBoards
             if (scene.name == "MenuCore")
             {
                 MenuButtonUI.AddButton("Beat Boards", BeatBoardsUIManager.Instance.BeatBoardsButtonPressed);
+                BeatBoardsUIManager.Instance.AddVotingButtons();
             }
         }
 
