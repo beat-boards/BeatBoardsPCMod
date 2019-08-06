@@ -2,13 +2,13 @@
   "$schema": "https://raw.githubusercontent.com/nike4613/ModSaber-MetadataFileSchema/master/Schema.json",
   "author": "Auros and raftario",
   "description": "Leaderboard plugin for Beat Saber!",
-  "gameVersion": "1.1.0p1",
+  "gameVersion": "1.2.0",
   "id": "Beat Boards PC",
   "name": "BeatBoards",
   "version": "0.0.1-alpha",
   "features": [],
   "links": {
-	  "project-source": "https://github.com/users/AurosTV/projects/1",
-	  "donate": "http://paypal.me/ADyn560"
+	  "project-source": "https://github.com/beat-boards/beatboardsnet",
+	  "donate": "http://ko-fi.com/aurosne"
   }
 }

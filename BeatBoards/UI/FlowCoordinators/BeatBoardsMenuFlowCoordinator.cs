@@ -46,6 +46,8 @@ namespace BeatBoards.UI.FlowCoordinators
                 _playerInfoViewController.ImageButtonPressed += _playerInfoViewController_editImageButtonPressed;
 
                 _friendsListViewController.AddFriendButtonPressed += _friendsListViewController_addFriendButtonPressed;
+
+                LoadData();
             }
 
             SetViewControllersToNavigationConctroller(_beatBoardsMenuNavigationController, new VRUIViewController[]
@@ -55,8 +57,15 @@ namespace BeatBoards.UI.FlowCoordinators
             ProvideInitialViewControllers(_beatBoardsMenuNavigationController, _friendsListViewController);
         }
 
+        private void LoadData()
+        {
+            
+            
+        }
+
         private void _friendsListViewController_addFriendButtonPressed()
         {
+            
             if (_addKeyboardViewController == null)
             {
                 _addKeyboardViewController = BeatSaberUI.CreateViewController<KeyboardViewController>();

@@ -65,10 +65,5 @@ namespace BeatBoards
         {
 
         }
-
-        
-
-        //MainFlowCoordinator mainFlowCoordinator = Resources.FindObjectsOfTypeAll<MainFlowCoordinator>().First();
-        //mainFlowCoordinator.InvokeMethod("PresentFlowCoordinator", bbmfc, null, null, false);
     }
 }

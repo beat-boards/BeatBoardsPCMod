@@ -8,11 +8,12 @@ using CustomUI.BeatSaber;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using BeatBoards.Core;
 using VRUI;
 
 namespace BeatBoards.UI.ViewControllers
 {
-    class PlayerInfoViewController : CustomViewController
+    public class PlayerInfoViewController : CustomViewController
     {
         private GameObject _loadingIndicator;
 
@@ -35,6 +36,8 @@ namespace BeatBoards.UI.ViewControllers
         public Action<string> NameButtonPressed;
         public Action ImageButtonPressed;
 
+        public User activeUser = new User();
+
         public override void __Activate(ActivationType activationType)
         {
             base.__Activate(activationType);
@@ -54,12 +57,10 @@ namespace BeatBoards.UI.ViewControllers
                 _titleText = headerPanelRectTransform.GetComponentInChildren<TextMeshProUGUI>();
                 _titleText.text = "";
 
-                
+                GET.Instance.GetUserFromPlatformID(this);
                 CreateText();
             }
         }
-
-        
 
         private void CreateText()
         {
@@ -86,7 +87,7 @@ namespace BeatBoards.UI.ViewControllers
             }
 
             _loadingIndicator.SetActive(false);
-            FakeData();
+            //FakeData();
             CreateButtons();
         }
 
@@ -111,6 +112,48 @@ namespace BeatBoards.UI.ViewControllers
             }
         }
 
+        public void LoadData()
+        {
+            RawImage rawImage = Image(activeUser.Image);
+            rawImage.transform.localPosition = new Vector3(100f, 12f);
+            _titleText.text = activeUser.Username;
+
+            StartCoroutine(MoveProfileAnimation(rawImage));
+        }
+
+        private void SetRealData()
+        {
+            _identifierText.text = $"<i><color=#a1a1a1>UUID: {activeUser.Id}</color></i>";
+            _nameText.text = $"Name: {activeUser.Username}";
+            _rankPointsText.text = $"Ranking Points: {activeUser.Rp}";
+
+            if (activeUser.Role == Role.ScoreSaber)
+                _randomText.text = "\"What a shame\"\n-Some dude 2019";
+            else
+                _randomText.text = "\"Sometimes, it really do be like that\"\n- Guy 2018";
+
+            if (activeUser.Banned == false)  _accountStatus.text = $"Status: <color=green>Active</color>"; else _accountStatus.text = $"Status: <color=red>Banned</color>";
+
+            if (activeUser.Role == Role.Player)
+                _roleText.text = $"Role: Player";
+            else if (activeUser.Role == Role.ScoreSaber)
+                _roleText.text = $"Role: <color=yellow>ScoreSaber</color>";
+            else if (activeUser.Role == Role.Curator)
+                _roleText.text = $"Role: <color=#d1f542>Curator</color>";
+            else if (activeUser.Role == Role.Supporter)
+                _roleText.text = $"Role: <color=#7e42f5>Supporter</color>";
+            else if (activeUser.Role == Role.Toxic)
+                _roleText.text = $"Role: <color=#507d2f>Toxic</color>";
+            else if (activeUser.Role == Role.Contributor)
+                _roleText.text = $"Role: <color=#b53875>Contributor</color>";
+            else if (activeUser.Role == Role.Ranker)
+                _roleText.text = $"Role: <color=#f0950c>Ranker</color>";
+            else if (activeUser.Role == Role.Owner)
+                _roleText.text = $"Role: <color=#00ffff>Owner</color>";
+
+            _rankText.text = $"Rank: 1";
+        }
+
         private void FakeData()
         {
             RawImage rawImage = Image(profilepictureb64);
@@ -130,7 +173,8 @@ namespace BeatBoards.UI.ViewControllers
 
                 yield return new WaitForSecondsRealtime(.01f);
             }
-            SetFakeData();
+            SetRealData();
+            //SetFakeData();
             yield break;
         }
 

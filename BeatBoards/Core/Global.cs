@@ -9,6 +9,22 @@ namespace BeatBoards.Core
     public class Global
     {
         public static string BeatBoardsID = "0";
+        public static string BeatBoardsAPIURL = "http://192.168.1.47:4321";
+    }
+
+    public class User
+    {
+        public string Id { get; set; }
+        public string SteamId { get; set; }
+        public string OculusId { get; set; }
+        public bool Banned { get; set; }
+        public string Username { get; set; }
+        public Role Role { get; set; }
+        public string Country { get; set; }
+        public float Rp { get; set; }
+        public int Fails { get; set; }
+        public string[] Following { get; set; }
+        public string Image { get; set; }
     }
 
     public class Following
@@ -17,11 +33,10 @@ namespace BeatBoards.Core
         public string Username { get; set; }
         public Role Role { get; set; }
         public string Country { get; set; }
-        
         public float RankingPoints { get; set; }
         public int Rank { get; set; }
         public int Fails { get; set; }
-
+        public string ImageB64 { get; set; }
     }
 
 

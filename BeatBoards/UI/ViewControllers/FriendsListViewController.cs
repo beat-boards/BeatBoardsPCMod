@@ -9,10 +9,15 @@ using CustomUI.BeatSaber;
 using BeatBoards.Core;
 using HMUI;
 using UnityEngine.UI;
+using Newtonsoft.Json;
+using UnityEngine.Networking;
+using BeatBoards.Utilities;
+using Logger = BeatBoards.Utilities.Logger;
+using System.Collections;
 
 namespace BeatBoards.UI.ViewControllers
 {
-    class FriendsListViewController : CustomListViewController
+    public class FriendsListViewController : CustomListViewController
     {
         public List<Following> Followers = new List<Following>();
 
@@ -48,8 +53,10 @@ namespace BeatBoards.UI.ViewControllers
 
                 Followers.Clear();
                 Data.Clear();
-                SetContent(new List<Following>() { new Following() { Uuid = "cc0d001a-9441-4768-a5e8-56f0e2e612a4", Country = "CA", Fails = 45, Rank = 2, RankingPoints = 910.42f, Role = Role.Owner, Username = "raftario" } });
-                
+                Followers = new List<Following>() { };
+                GET.Instance.GetFriends("cc0d001a-9441-4768-a5e8-56f0e2e612a4", this);
+                //SetContent(new List<Following>() { new Following() { Uuid = "cc0d001a-9441-4768-a5e8-56f0e2e612a4", Country = "CA", Fails = 45, Rank = 2, RankingPoints = 910.42f, Role = Role.Owner, Username = "raftario" } });
+
             }
             else
             {
@@ -83,16 +90,11 @@ namespace BeatBoards.UI.ViewControllers
             _customListTableView.ReloadData();
         }
 
-        public void SetContent(List<Following> followers)
+        public void SetContent()
         {
-            if (followers == null && Followers != null)
-                Followers.Clear();
-            else
-                Followers = new List<Following>(followers);
-
             foreach (var follower in Followers)
             {
-                Data.Add(new CustomCellInfo(follower.Username, $"Rank: {follower.Rank} | Rank Points: {follower.RankingPoints}", SpriteGenerator(raftariob64)));
+                Data.Add(new CustomCellInfo(follower.Username, $"Rank: {follower.Rank} | Rank Points: {follower.RankingPoints}", SpriteGenerator(follower.ImageB64)));
             }
 
             _customListTableView.ReloadData();
