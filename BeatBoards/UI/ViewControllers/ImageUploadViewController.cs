@@ -39,8 +39,13 @@ namespace BeatBoards.UI.ViewControllers
                     _titleText.text = "Change Profile Picture";
                 }
 
-                _statusText = BeatSaberUI.CreateText(rectTransform, "Place a .jpg or .png in <u>UserData/BeatBoards/ProfilePicture</u>\nMaximum file size: <color=red>100KB</color>\nNo File Found.", new Vector2(0, 0));
-                _statusText.alignment = TextAlignmentOptions.Center;
+                if (_titleText == null)
+                {
+                    _statusText = BeatSaberUI.CreateText(rectTransform, "Place a .jpg or .png in <u>UserData/BeatBoards/ProfilePicture</u>\nMaximum file size: <color=red>100KB</color>\nNo File Found.", new Vector2(0, 0));
+                    _statusText.alignment = TextAlignmentOptions.Center;
+                }
+
+                
 
                 _refreshButton = BeatSaberUI.CreateUIButton(rectTransform, "OkButton", new Vector2(0, -30));
                 _setButton = BeatSaberUI.CreateUIButton(rectTransform, "OkButton", new Vector2(20, -30));

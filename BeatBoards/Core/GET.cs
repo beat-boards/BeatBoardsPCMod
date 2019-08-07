@@ -10,6 +10,7 @@ using System.Collections;
 using UnityEngine.Networking;
 using Newtonsoft.Json;
 using BeatBoards.UI.ViewControllers;
+using BS_Utils.Gameplay;
 
 namespace BeatBoards.Core
 {
@@ -32,25 +33,15 @@ namespace BeatBoards.Core
         }
 
 
-        public void GetUserFromPlatformID(PlayerInfoViewController vc)
+        private void GetLeaderboard()
         {
-            //StopAllCoroutines();
-            StartCoroutine(GetUserEnumerator("cc0d001a-9441-4768-a5e8-56f0e2e612a4", vc));
 
-            if (BS_Utils.Gameplay.GetUserInfo.GetUserID().ToString().StartsWith("765"))
-            {
-                //STEAM
-            }
-            else if (BS_Utils.Gameplay.GetUserInfo.GetUserID().ToString().Length == 16)
-            {
-                //OCULUS
-            }
         }
 
-        private IEnumerator GetUserEnumerator(string platformID, PlayerInfoViewController playerInfoViewController)
+        private IEnumerator GetLeaderboardEnumerator(string hash)
         {
-            User currentPlayer = new User();
-            UnityWebRequest www = UnityWebRequest.Get(Global.BeatBoardsAPIURL + "/users/" + platformID);
+            Map map = new Map();
+            UnityWebRequest www = UnityWebRequest.Get(Global.BeatBoardsAPIURL + "/maps" + $"?hash=" + hash);
             yield return www.SendWebRequest();
 
             if (www.isNetworkError || www.isHttpError)
@@ -60,7 +51,48 @@ namespace BeatBoards.Core
             }
             else
             {
-                currentPlayer = JsonConvert.DeserializeObject<User>(www.downloadHandler.text);
+                map = JsonConvert.DeserializeObject<List<Map>>(www.downloadHandler.text).FirstOrDefault();
+                
+
+
+            }
+            yield break;
+        }
+
+
+        public void GetUserFromPlatformID(PlayerInfoViewController vc)
+        {
+            //StopAllCoroutines();
+            StopCoroutine(GetUserEnumerator(null, null, null));
+            //StartCoroutine(GetUserEnumerator("cc0d001a-9441-4768-a5e8-56f0e2e612a4", vc));
+            string id = GetUserInfo.GetUserID().ToString();
+
+            if (id.StartsWith("7656"))
+            {
+                //STEAM
+                StartCoroutine(GetUserEnumerator(id, vc, "steamId"));
+            }
+            else if (id.Length == 16)
+            {
+                //OCULUS
+                StartCoroutine(GetUserEnumerator(id, vc, "oculusId"));
+            }
+        }
+
+        private IEnumerator GetUserEnumerator(string platformID, PlayerInfoViewController playerInfoViewController, string type)
+        {
+            User currentPlayer = new User();
+            UnityWebRequest www = UnityWebRequest.Get(Global.BeatBoardsAPIURL + "/users" + $"?{type}=" + platformID);
+            yield return www.SendWebRequest();
+
+            if (www.isNetworkError || www.isHttpError)
+            {
+                Logger.Log.Error(www.error);
+                yield return new WaitForSeconds(.05f);
+            }
+            else
+            {
+                currentPlayer = JsonConvert.DeserializeObject<List<User>>(www.downloadHandler.text).FirstOrDefault();
                 playerInfoViewController.activeUser = currentPlayer;
                 playerInfoViewController.LoadData();
             }
@@ -69,7 +101,7 @@ namespace BeatBoards.Core
 
         public void GetFriends(string UUID, FriendsListViewController vc) //I'm going to be using Enumerators so this is just a workaround since I can't return the value...
         {
-            //StopAllCoroutines();
+            StopCoroutine(FriendsEnumerator(null, null));
             StartCoroutine(FriendsEnumerator(UUID, vc));
         }
 

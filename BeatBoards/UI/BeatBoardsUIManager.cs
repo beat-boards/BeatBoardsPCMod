@@ -197,6 +197,8 @@ namespace BeatBoards.UI
             StartCoroutine(GetMapData(arg1.level.levelID, arg1.difficulty));
             currentlySelectedBeatmap = arg1;
 
+            Logger.Log.Warn(arg1.level.levelID);
+
         }
 
         public void AddVotingButtons()

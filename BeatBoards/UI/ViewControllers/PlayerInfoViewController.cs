@@ -127,10 +127,13 @@ namespace BeatBoards.UI.ViewControllers
             _nameText.text = $"Name: {activeUser.Username}";
             _rankPointsText.text = $"Ranking Points: {activeUser.Rp}";
 
+            System.Random random = new System.Random();
+            int randomInt = random.Next(Global.RandomTextV1.Count);
+
             if (activeUser.Role == Role.ScoreSaber)
                 _randomText.text = "\"What a shame\"\n-Some dude 2019";
             else
-                _randomText.text = "\"Sometimes, it really do be like that\"\n- Guy 2018";
+                _randomText.text = Global.RandomTextV1[randomInt]; //"\"Sometimes, it really do be like that\"\n- Guy 2018";
 
             if (activeUser.Banned == false)  _accountStatus.text = $"Status: <color=green>Active</color>"; else _accountStatus.text = $"Status: <color=red>Banned</color>";
 
